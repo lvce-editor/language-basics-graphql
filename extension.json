@@ -5,7 +5,7 @@
   "languages": [
     {
       "id": "graphql",
-      "extensions": [".gql"],
+      "extensions": [".gql", ".graphql", ".graphqls"],
       "tokenize": "src/tokenizeGraphql.js"
     }
   ]
