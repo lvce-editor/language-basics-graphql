@@ -1,0 +1,10 @@
+query {
+  allMarkdownRemark {
+    totalCount
+    edges {
+      node {
+        id
+      }
+    }
+  }
+}

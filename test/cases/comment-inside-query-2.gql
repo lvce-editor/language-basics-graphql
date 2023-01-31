@@ -1,0 +1,6 @@
+{
+  films {
+    # Getting film titles
+    title
+  }
+}
