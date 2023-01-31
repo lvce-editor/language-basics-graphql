@@ -21,5 +21,12 @@
   "prettier": {
     "semi": false,
     "singleQuote": true
+  },
+  "test-tokenize": {
+    "skip": [
+      "gatsby-e2e-tests-contentful-schema",
+      "gatsby-examples-creating-source-plugins-api-src",
+      "gatsby-packages-gatsby-src-query-tests-fixtures-query-compiler"
+    ]
   }
 }
