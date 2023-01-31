@@ -1,11 +1,15 @@
 Text
 NewLine
+Whitespace
 Text
 NewLine
+Whitespace
+Comment
+NewLine
+Whitespace
 Text
 NewLine
-Text
-NewLine
+Whitespace
 Text
 NewLine
 Text

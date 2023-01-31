@@ -9,11 +9,15 @@ export const TokenType = {
   None: 0,
   Text: 1,
   Comment: 2,
+  Whitespace: 3,
+  Keyword: 4,
 }
 
 export const TokenMap = {
   [TokenType.Text]: 'Text',
   [TokenType.Comment]: 'Comment',
+  [TokenType.Whitespace]: 'Whitespace',
+  [TokenType.Keyword]: 'Keyword',
 }
 
 export const initialLineState = {
@@ -23,6 +27,8 @@ export const initialLineState = {
 
 const RE_LINE_COMMENT = /^#.*/s
 const RE_ANYTHING = /^.+/s
+const RE_KEYWORD = /^(?:type|scalar|enum)\b/
+const RE_WHITESPACE = /^\s+/
 
 export const hasArrayReturn = true
 
@@ -40,7 +46,13 @@ export const tokenizeLine = (line, lineState) => {
     const part = line.slice(index)
     switch (state) {
       case State.TopLevelContent:
-        if ((next = part.match(RE_LINE_COMMENT))) {
+        if ((next = part.match(RE_WHITESPACE))) {
+          token = TokenType.Whitespace
+          state = State.TopLevelContent
+        } else if ((next = part.match(RE_KEYWORD))) {
+          token = TokenType.Keyword
+          state = State.TopLevelContent
+        } else if ((next = part.match(RE_LINE_COMMENT))) {
           token = TokenType.Comment
           state = State.TopLevelContent
         } else if ((next = part.match(RE_ANYTHING))) {
