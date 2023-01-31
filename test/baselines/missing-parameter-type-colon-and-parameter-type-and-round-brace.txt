@@ -2,9 +2,11 @@ Keyword
 Whitespace
 Type
 Whitespace
-Text
+Punctuation
 NewLine
 Whitespace
-Text
+Function
+Punctuation
+VariableName
 NewLine
-Text
+Punctuation
