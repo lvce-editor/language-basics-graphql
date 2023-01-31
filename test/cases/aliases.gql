@@ -1,0 +1,4 @@
+{
+  luke: hero(id: "1000") { name }
+  han: hero(id: "1001") { name }
+}

@@ -1,0 +1,7 @@
+{
+  search(q: "john") {
+    id
+    ... on User { name }
+    ... on Comment { body author { name } }
+  }
+}
