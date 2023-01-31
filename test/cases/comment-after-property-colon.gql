@@ -1,0 +1,4 @@
+type Something {
+    User(id: ID!): # User
+    User2(id: ID!): # User 2
+}
