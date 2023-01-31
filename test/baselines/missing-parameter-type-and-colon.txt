@@ -1,5 +1,7 @@
 Keyword
 Whitespace
+Type
+Whitespace
 Text
 NewLine
 Whitespace
