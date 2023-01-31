@@ -1,5 +1,6 @@
 const State = {
   TopLevelContent: 1,
+  AfterKeywordType: 2,
 }
 
 /**
@@ -11,6 +12,7 @@ export const TokenType = {
   Comment: 2,
   Whitespace: 3,
   Keyword: 4,
+  Type: 5,
 }
 
 export const TokenMap = {
@@ -18,6 +20,7 @@ export const TokenMap = {
   [TokenType.Comment]: 'Comment',
   [TokenType.Whitespace]: 'Whitespace',
   [TokenType.Keyword]: 'Keyword',
+  [TokenType.Type]: 'Type',
 }
 
 export const initialLineState = {
@@ -29,6 +32,7 @@ const RE_LINE_COMMENT = /^#.*/s
 const RE_ANYTHING = /^.+/s
 const RE_KEYWORD = /^(?:type|scalar|enum)\b/
 const RE_WHITESPACE = /^\s+/
+const RE_VARIABLE_NAME = /^[a-zA-Z][a-zA-Z\d\_\-]*/
 
 export const hasArrayReturn = true
 
@@ -52,6 +56,13 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_KEYWORD))) {
           token = TokenType.Keyword
           state = State.TopLevelContent
+          switch (next[0]) {
+            case 'type':
+              state = State.AfterKeywordType
+              break
+            default:
+              break
+          }
         } else if ((next = part.match(RE_LINE_COMMENT))) {
           token = TokenType.Comment
           state = State.TopLevelContent
@@ -60,6 +71,20 @@ export const tokenizeLine = (line, lineState) => {
           state = State.TopLevelContent
         } else {
           part //?
+          throw new Error('no')
+        }
+        break
+      case State.AfterKeywordType:
+        if ((next = part.match(RE_WHITESPACE))) {
+          token = TokenType.Whitespace
+          state = State.AfterKeywordType
+        } else if ((next = part.match(RE_VARIABLE_NAME))) {
+          token = TokenType.Type
+          state = State.TopLevelContent
+        } else if ((next = part.match(RE_LINE_COMMENT))) {
+          token = TokenType.Comment
+          state = State.TopLevelContent
+        } else {
           throw new Error('no')
         }
         break
