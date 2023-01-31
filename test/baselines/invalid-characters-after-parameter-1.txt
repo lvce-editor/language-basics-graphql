@@ -1,5 +1,6 @@
 Text
 NewLine
+Whitespace
 Text
 NewLine
 Text
