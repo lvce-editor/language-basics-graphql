@@ -6,6 +6,7 @@ const State = {
   InsideFunctionParameters: 6,
   BeforeType: 7,
   InsideDoubleQuoteString: 8,
+  AfterKeywordScalar: 9,
 }
 
 /**
@@ -93,6 +94,9 @@ export const tokenizeLine = (line, lineState) => {
             case 'type':
             case 'input':
               state = State.AfterKeywordTypeOrInput
+              break
+            case 'scalar':
+              state = State.AfterKeywordScalar
               break
             default:
               break
@@ -257,6 +261,20 @@ export const tokenizeLine = (line, lineState) => {
           throw new Error('no')
         }
         break
+      case State.AfterKeywordScalar:
+        if ((next = part.match(RE_WHITESPACE))) {
+          token = TokenType.Whitespace
+          state = State.AfterKeywordScalar
+        } else if ((next = part.match(RE_VARIABLE_NAME))) {
+          token = TokenType.Type
+          state = State.AfterKeywordScalar
+        } else if ((next = part.match(RE_LINE_COMMENT))) {
+          token = TokenType.Comment
+          state = State.TopLevelContent
+        } else {
+          throw new Error('no')
+        }
+        break
       default:
         throw new Error('no')
     }
@@ -266,6 +284,9 @@ export const tokenizeLine = (line, lineState) => {
   }
   if (state === State.BeforeType) {
     state = State.InsideTypeObject
+  }
+  if (state === State.AfterKeywordScalar) {
+    state = State.TopLevelContent
   }
   return {
     state,
