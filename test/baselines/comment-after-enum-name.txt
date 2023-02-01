@@ -1,0 +1,5 @@
+Keyword
+Whitespace
+Type
+Whitespace
+Comment
