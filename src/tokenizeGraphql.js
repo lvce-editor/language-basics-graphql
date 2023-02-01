@@ -75,6 +75,7 @@ const RE_DOUBLE_QUOTE = /^"/
 const RE_TRIPLE_QUOTED_STRING_CONTENT_DOUBLE_QUOTES = /.*(?=""")/s
 const RE_TRIPLE_QUOTED_STRING_CONTENT_COMMON = /.*/s
 const RE_TRIPLE_DOUBLE_QUOTE = /^"{3}/
+const RE_AMPERSAND = /^\&/
 
 export const hasArrayReturn = true
 
@@ -140,6 +141,12 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_LINE_COMMENT))) {
           token = TokenType.Comment
           state = State.TopLevelContent
+        } else if ((next = part.match(RE_DECORATOR))) {
+          token = TokenType.VariableName
+          state = State.AfterKeywordTypeOrInput
+        } else if ((next = part.match(RE_CURLY_OPEN))) {
+          token = TokenType.Punctuation
+          state = State.InsideTypeObject
         } else {
           part
           throw new Error('no')
@@ -155,7 +162,21 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_VARIABLE_NAME))) {
           token = TokenType.VariableName
           state = State.AfterTypeName
+        } else if ((next = part.match(RE_DECORATOR))) {
+          token = TokenType.VariableName
+          state = State.AfterTypeName
+        } else if ((next = part.match(RE_AMPERSAND))) {
+          token = TokenType.Punctuation
+          state = State.AfterTypeName
+        } else if ((next = part.match(RE_ROUND_OPEN))) {
+          token = TokenType.Punctuation
+          state = State.InsideFunctionParameters
+          stack.push(State.AfterTypeName)
+        } else if ((next = part.match(RE_EQUAL_SIGN))) {
+          token = TokenType.Punctuation
+          state = State.AfterTypeName
         } else {
+          part
           throw new Error('no')
         }
         break
@@ -212,6 +233,7 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_COLON))) {
           token = TokenType.Punctuation
           state = State.BeforeType
+          stack.push(State.InsideFunctionParameters)
         } else if ((next = part.match(RE_ROUND_CLOSE))) {
           token = TokenType.Punctuation
           state = stack.pop() || State.TopLevelContent
@@ -222,9 +244,19 @@ export const tokenizeLine = (line, lineState) => {
           token = TokenType.Punctuation
           state = State.InsideTripleDoubleQuoteString
           stack.push(State.InsideTypeObject)
+        } else if ((next = part.match(RE_COMMA))) {
+          token = TokenType.Punctuation
+          state = State.InsideFunctionParameters
         } else if ((next = part.match(RE_LINE_COMMENT))) {
           token = TokenType.Comment
           state = State.InsideFunctionParameters
+        } else if ((next = part.match(RE_SQUARE_CLOSE))) {
+          token = TokenType.Punctuation
+          state = State.InsideFunctionParameters
+        } else if ((next = part.match(RE_DOUBLE_QUOTE))) {
+          token = TokenType.Punctuation
+          state = State.InsideDoubleQuoteString
+          stack.push(State.InsideFunctionParameters)
         } else {
           part
           throw new Error('no')
@@ -267,6 +299,13 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_QUOTE_DOUBLE))) {
           token = TokenType.Punctuation
           state = State.InsideDoubleQuoteString
+        } else if ((next = part.match(RE_DECORATOR))) {
+          token = TokenType.VariableName
+          state = State.BeforeType
+        } else if ((next = part.match(RE_ROUND_OPEN))) {
+          token = TokenType.Punctuation
+          state = State.InsideFunctionParameters
+          stack.push(State.BeforeType)
         } else {
           part
           throw new Error('no')

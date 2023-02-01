@@ -1,0 +1,1 @@
+type File implements Node @special {}

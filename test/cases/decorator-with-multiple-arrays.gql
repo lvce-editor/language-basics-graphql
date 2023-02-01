@@ -1,0 +1,1 @@
+type Markdown implements Node @childOf(mimeTypes: ["test", "test"], types: ["test", "test", "test"]) @derivedTypes @dontInfer {}
