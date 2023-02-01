@@ -5,12 +5,6 @@ Whitespace
 Punctuation
 NewLine
 Whitespace
-VariableName
-NewLine
-Whitespace
-VariableName
-NewLine
-Whitespace
-VariableName
+Comment
 NewLine
 Punctuation

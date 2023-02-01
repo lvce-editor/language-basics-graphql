@@ -7,6 +7,8 @@ const State = {
   BeforeType: 7,
   InsideDoubleQuoteString: 8,
   AfterKeywordScalarOrUnion: 9,
+  AfterKeywordEnum: 10,
+  InsideEnum: 11,
 }
 
 /**
@@ -99,6 +101,10 @@ export const tokenizeLine = (line, lineState) => {
             case 'scalar':
             case 'union':
               state = State.AfterKeywordScalarOrUnion
+
+              break
+            case 'enum':
+              state = State.AfterKeywordEnum
               break
             default:
               break
@@ -280,6 +286,40 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_PIPE))) {
           token = TokenType.Punctuation
           state = State.AfterKeywordScalarOrUnion
+        } else {
+          throw new Error('no')
+        }
+        break
+      case State.AfterKeywordEnum:
+        if ((next = part.match(RE_WHITESPACE))) {
+          token = TokenType.Whitespace
+          state = State.AfterKeywordEnum
+        } else if ((next = part.match(RE_VARIABLE_NAME))) {
+          token = TokenType.Type
+          state = State.AfterKeywordEnum
+        } else if ((next = part.match(RE_CURLY_OPEN))) {
+          token = TokenType.Punctuation
+          state = State.InsideEnum
+        } else if ((next = part.match(RE_LINE_COMMENT))) {
+          token = TokenType.Comment
+          state = State.AfterKeywordEnum
+        } else {
+          throw new Error('no')
+        }
+        break
+      case State.InsideEnum:
+        if ((next = part.match(RE_WHITESPACE))) {
+          token = TokenType.Whitespace
+          state = State.InsideEnum
+        } else if ((next = part.match(RE_VARIABLE_NAME))) {
+          token = TokenType.VariableName
+          state = State.InsideEnum
+        } else if ((next = part.match(RE_CURLY_CLOSE))) {
+          token = TokenType.Punctuation
+          state = State.TopLevelContent
+        } else if ((next = part.match(RE_LINE_COMMENT))) {
+          token = TokenType.Comment
+          state = State.InsideEnum
         } else {
           throw new Error('no')
         }
