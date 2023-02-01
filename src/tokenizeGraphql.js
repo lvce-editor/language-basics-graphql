@@ -6,7 +6,7 @@ const State = {
   InsideFunctionParameters: 6,
   BeforeType: 7,
   InsideDoubleQuoteString: 8,
-  AfterKeywordScalar: 9,
+  AfterKeywordScalarOrUnion: 9,
 }
 
 /**
@@ -47,7 +47,7 @@ export const initialLineState = {
 
 const RE_LINE_COMMENT = /^#.*/s
 const RE_ANYTHING = /^.+/s
-const RE_KEYWORD = /^(?:type|scalar|enum|input)\b/
+const RE_KEYWORD = /^(?:type|scalar|enum|input|union)\b/
 const RE_WHITESPACE = /^\s+/
 const RE_VARIABLE_NAME = /^[a-zA-Z][a-zA-Z\d\_\-]*/
 const RE_CURLY_OPEN = /^\{/
@@ -66,6 +66,7 @@ const RE_QUOTE_DOUBLE = /^"/
 const RE_STRING_DOUBLE_QUOTE_CONTENT = /^[^"\\]+/
 const RE_STRING_ESCAPE = /^\\./
 const RE_BACKSLASH = /^\\/
+const RE_PIPE = /^\|/
 
 export const hasArrayReturn = true
 
@@ -96,7 +97,8 @@ export const tokenizeLine = (line, lineState) => {
               state = State.AfterKeywordTypeOrInput
               break
             case 'scalar':
-              state = State.AfterKeywordScalar
+            case 'union':
+              state = State.AfterKeywordScalarOrUnion
               break
             default:
               break
@@ -261,16 +263,22 @@ export const tokenizeLine = (line, lineState) => {
           throw new Error('no')
         }
         break
-      case State.AfterKeywordScalar:
+      case State.AfterKeywordScalarOrUnion:
         if ((next = part.match(RE_WHITESPACE))) {
           token = TokenType.Whitespace
-          state = State.AfterKeywordScalar
+          state = State.AfterKeywordScalarOrUnion
         } else if ((next = part.match(RE_VARIABLE_NAME))) {
           token = TokenType.Type
-          state = State.AfterKeywordScalar
+          state = State.AfterKeywordScalarOrUnion
         } else if ((next = part.match(RE_LINE_COMMENT))) {
           token = TokenType.Comment
           state = State.TopLevelContent
+        } else if ((next = part.match(RE_EQUAL_SIGN))) {
+          token = TokenType.Punctuation
+          state = State.AfterKeywordScalarOrUnion
+        } else if ((next = part.match(RE_PIPE))) {
+          token = TokenType.Punctuation
+          state = State.AfterKeywordScalarOrUnion
         } else {
           throw new Error('no')
         }
@@ -285,7 +293,7 @@ export const tokenizeLine = (line, lineState) => {
   if (state === State.BeforeType) {
     state = State.InsideTypeObject
   }
-  if (state === State.AfterKeywordScalar) {
+  if (state === State.AfterKeywordScalarOrUnion) {
     state = State.TopLevelContent
   }
   return {
