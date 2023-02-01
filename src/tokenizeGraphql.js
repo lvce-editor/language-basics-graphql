@@ -160,8 +160,9 @@ export const tokenizeLine = (line, lineState) => {
           stack.push(State.InsideTypeObject)
           state = State.InsideFunctionParameters
         } else if ((next = part.match(RE_CURLY_CLOSE))) {
+          stack.pop()
           token = TokenType.Punctuation
-          state = stack.pop() || State.TopLevelContent
+          state = State.TopLevelContent
         } else if ((next = part.match(RE_LINE_COMMENT))) {
           token = TokenType.Comment
           state = State.InsideTypeObject

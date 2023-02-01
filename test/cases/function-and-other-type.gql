@@ -1,0 +1,9 @@
+type Count {
+  count(
+    skip: Int
+  ): Int
+}
+
+type Directory {
+  next: Directory
+}
