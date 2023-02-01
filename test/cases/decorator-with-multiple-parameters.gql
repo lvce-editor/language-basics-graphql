@@ -1,0 +1,3 @@
+type File {
+  link: @link(by: "id", from: "other")
+}
