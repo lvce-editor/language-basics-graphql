@@ -1,6 +1,6 @@
 const State = {
   TopLevelContent: 1,
-  AfterKeywordType: 2,
+  AfterKeywordTypeOrInput: 2,
   AfterTypeName: 3,
   InsideTypeObject: 4,
   InsideFunctionParameters: 6,
@@ -46,7 +46,7 @@ export const initialLineState = {
 
 const RE_LINE_COMMENT = /^#.*/s
 const RE_ANYTHING = /^.+/s
-const RE_KEYWORD = /^(?:type|scalar|enum)\b/
+const RE_KEYWORD = /^(?:type|scalar|enum|input)\b/
 const RE_WHITESPACE = /^\s+/
 const RE_VARIABLE_NAME = /^[a-zA-Z][a-zA-Z\d\_\-]*/
 const RE_CURLY_OPEN = /^\{/
@@ -91,7 +91,8 @@ export const tokenizeLine = (line, lineState) => {
           state = State.TopLevelContent
           switch (next[0]) {
             case 'type':
-              state = State.AfterKeywordType
+            case 'input':
+              state = State.AfterKeywordTypeOrInput
               break
             default:
               break
@@ -107,10 +108,10 @@ export const tokenizeLine = (line, lineState) => {
           throw new Error('no')
         }
         break
-      case State.AfterKeywordType:
+      case State.AfterKeywordTypeOrInput:
         if ((next = part.match(RE_WHITESPACE))) {
           token = TokenType.Whitespace
-          state = State.AfterKeywordType
+          state = State.AfterKeywordTypeOrInput
         } else if ((next = part.match(RE_VARIABLE_NAME))) {
           token = TokenType.Type
           state = State.AfterTypeName
