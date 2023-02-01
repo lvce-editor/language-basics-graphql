@@ -128,7 +128,7 @@ Whitespace
 Punctuation
 String
 Punctuation
-Text
+Punctuation
 NewLine
 NewLine
 Keyword
@@ -1063,7 +1063,7 @@ Whitespace
 Punctuation
 String
 Punctuation
-Text
+Punctuation
 NewLine
 NewLine
 Keyword

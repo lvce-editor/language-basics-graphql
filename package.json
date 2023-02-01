@@ -25,7 +25,6 @@
   "test-tokenize": {
     "skip": [
       "gatsby-e2e-tests-contentful-schema",
-      "graphql-compose-examples-elasticsearch-data-schema",
       "graphql-compose-examples-mongoosediscriminators-data-schema"
     ]
   }
