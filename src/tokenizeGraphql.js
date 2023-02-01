@@ -1,6 +1,6 @@
 const State = {
   TopLevelContent: 1,
-  AfterKeywordTypeOrInput: 2,
+  AfterKeywordTypeOrInputOrInterface: 2,
   AfterTypeName: 3,
   InsideTypeObject: 4,
   InsideFunctionParameters: 6,
@@ -50,7 +50,7 @@ export const initialLineState = {
 
 const RE_LINE_COMMENT = /^#.*/s
 const RE_ANYTHING = /^.+/s
-const RE_KEYWORD = /^(?:type|scalar|enum|input|union)\b/
+const RE_KEYWORD = /^(?:type|scalar|enum|input|union|interface)\b/
 const RE_WHITESPACE = /^\s+/
 const RE_VARIABLE_NAME = /^[a-zA-Z\_][a-zA-Z\d\_\-]*/
 const RE_DECORATOR = /^@\w+/
@@ -103,12 +103,12 @@ export const tokenizeLine = (line, lineState) => {
           switch (next[0]) {
             case 'type':
             case 'input':
-              state = State.AfterKeywordTypeOrInput
+            case 'interface':
+              state = State.AfterKeywordTypeOrInputOrInterface
               break
             case 'scalar':
             case 'union':
               state = State.AfterKeywordScalarOrUnion
-
               break
             case 'enum':
               state = State.AfterKeywordEnum
@@ -131,10 +131,10 @@ export const tokenizeLine = (line, lineState) => {
           throw new Error('no')
         }
         break
-      case State.AfterKeywordTypeOrInput:
+      case State.AfterKeywordTypeOrInputOrInterface:
         if ((next = part.match(RE_WHITESPACE))) {
           token = TokenType.Whitespace
-          state = State.AfterKeywordTypeOrInput
+          state = State.AfterKeywordTypeOrInputOrInterface
         } else if ((next = part.match(RE_VARIABLE_NAME))) {
           token = TokenType.Type
           state = State.AfterTypeName
@@ -143,7 +143,7 @@ export const tokenizeLine = (line, lineState) => {
           state = State.TopLevelContent
         } else if ((next = part.match(RE_DECORATOR))) {
           token = TokenType.VariableName
-          state = State.AfterKeywordTypeOrInput
+          state = State.AfterKeywordTypeOrInputOrInterface
         } else if ((next = part.match(RE_CURLY_OPEN))) {
           token = TokenType.Punctuation
           state = State.InsideTypeObject

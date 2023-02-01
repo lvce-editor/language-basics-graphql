@@ -22,9 +22,5 @@
     "semi": false,
     "singleQuote": true
   },
-  "test-tokenize": {
-    "skip": [
-      "graphql-compose-examples-mongoosediscriminators-data-schema"
-    ]
-  }
+  "test-tokenize": {}
 }

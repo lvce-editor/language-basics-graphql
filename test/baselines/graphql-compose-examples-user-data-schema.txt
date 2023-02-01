@@ -37,7 +37,11 @@ NewLine
 Punctuation
 NewLine
 NewLine
-Text
+Keyword
+Whitespace
+Type
+Whitespace
+Punctuation
 NewLine
 Whitespace
 Punctuation
@@ -45,9 +49,12 @@ String
 Punctuation
 NewLine
 Whitespace
-Text
+VariableName
+Punctuation
+Whitespace
+Type
 NewLine
-Text
+Punctuation
 NewLine
 NewLine
 Keyword
