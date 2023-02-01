@@ -1,0 +1,11 @@
+Keyword
+Whitespace
+Type
+Whitespace
+Punctuation
+Whitespace
+Type
+Whitespace
+Punctuation
+Whitespace
+Type
