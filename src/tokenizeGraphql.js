@@ -141,6 +141,7 @@ export const tokenizeLine = (line, lineState) => {
           token = TokenType.Comment
           state = State.TopLevelContent
         } else {
+          part
           throw new Error('no')
         }
         break
@@ -274,7 +275,7 @@ export const tokenizeLine = (line, lineState) => {
       case State.InsideDoubleQuoteString:
         if ((next = part.match(RE_QUOTE_DOUBLE))) {
           token = TokenType.Punctuation
-          state = State.TopLevelContent
+          state = stack.pop() || State.TopLevelContent
         } else if ((next = part.match(RE_STRING_DOUBLE_QUOTE_CONTENT))) {
           token = TokenType.String
           state = State.InsideDoubleQuoteString
@@ -311,7 +312,11 @@ export const tokenizeLine = (line, lineState) => {
           token = TokenType.Punctuation
           state = State.InsideFunctionParameters
           stack.push(State.AfterKeywordScalarOrUnion)
+        } else if ((next = part.match(RE_ROUND_CLOSE))) {
+          token = TokenType.Punctuation
+          state = State.AfterKeywordScalarOrUnion
         } else {
+          part
           throw new Error('no')
         }
         break
