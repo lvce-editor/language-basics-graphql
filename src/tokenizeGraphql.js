@@ -9,6 +9,7 @@ const State = {
   AfterKeywordScalarOrUnion: 9,
   AfterKeywordEnum: 10,
   InsideEnum: 11,
+  InsideTripleDoubleQuoteString: 12,
 }
 
 /**
@@ -51,7 +52,8 @@ const RE_LINE_COMMENT = /^#.*/s
 const RE_ANYTHING = /^.+/s
 const RE_KEYWORD = /^(?:type|scalar|enum|input|union)\b/
 const RE_WHITESPACE = /^\s+/
-const RE_VARIABLE_NAME = /^[a-zA-Z][a-zA-Z\d\_\-]*/
+const RE_VARIABLE_NAME = /^[a-zA-Z\_][a-zA-Z\d\_\-]*/
+const RE_DECORATOR = /^@\w+/
 const RE_CURLY_OPEN = /^\{/
 const RE_ROUND_OPEN = /^\(/
 const RE_ROUND_CLOSE = /^\)/
@@ -69,6 +71,10 @@ const RE_STRING_DOUBLE_QUOTE_CONTENT = /^[^"\\]+/
 const RE_STRING_ESCAPE = /^\\./
 const RE_BACKSLASH = /^\\/
 const RE_PIPE = /^\|/
+const RE_DOUBLE_QUOTE = /^"/
+const RE_TRIPLE_QUOTED_STRING_CONTENT_DOUBLE_QUOTES = /.*(?=""")/s
+const RE_TRIPLE_QUOTED_STRING_CONTENT_COMMON = /.*/s
+const RE_TRIPLE_DOUBLE_QUOTE = /^"{3}/
 
 export const hasArrayReturn = true
 
@@ -112,6 +118,10 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_LINE_COMMENT))) {
           token = TokenType.Comment
           state = State.TopLevelContent
+        } else if ((next = part.match(RE_TRIPLE_DOUBLE_QUOTE))) {
+          token = TokenType.Punctuation
+          state = State.InsideTripleDoubleQuoteString
+          stack.push(State.TopLevelContent)
         } else if ((next = part.match(RE_ANYTHING))) {
           token = TokenType.Text
           state = State.TopLevelContent
@@ -169,6 +179,10 @@ export const tokenizeLine = (line, lineState) => {
           stack.pop()
           token = TokenType.Punctuation
           state = State.TopLevelContent
+        } else if ((next = part.match(RE_TRIPLE_DOUBLE_QUOTE))) {
+          token = TokenType.Punctuation
+          state = State.InsideTripleDoubleQuoteString
+          stack.push(State.InsideTypeObject)
         } else if ((next = part.match(RE_LINE_COMMENT))) {
           token = TokenType.Comment
           state = State.InsideTypeObject
@@ -203,6 +217,10 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_CURLY_CLOSE))) {
           token = TokenType.Punctuation
           state = stack.pop() || State.TopLevelContent
+        } else if ((next = part.match(RE_TRIPLE_DOUBLE_QUOTE))) {
+          token = TokenType.Punctuation
+          state = State.InsideTripleDoubleQuoteString
+          stack.push(State.InsideTypeObject)
         } else if ((next = part.match(RE_LINE_COMMENT))) {
           token = TokenType.Comment
           state = State.InsideFunctionParameters
@@ -286,6 +304,13 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_PIPE))) {
           token = TokenType.Punctuation
           state = State.AfterKeywordScalarOrUnion
+        } else if ((next = part.match(RE_DECORATOR))) {
+          token = TokenType.VariableName
+          state = State.AfterKeywordScalarOrUnion
+        } else if ((next = part.match(RE_ROUND_OPEN))) {
+          token = TokenType.Punctuation
+          state = State.InsideFunctionParameters
+          stack.push(State.AfterKeywordScalarOrUnion)
         } else {
           throw new Error('no')
         }
@@ -320,6 +345,24 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_LINE_COMMENT))) {
           token = TokenType.Comment
           state = State.InsideEnum
+        } else {
+          throw new Error('no')
+        }
+        break
+      case State.InsideTripleDoubleQuoteString:
+        if ((next = part.match(RE_TRIPLE_DOUBLE_QUOTE))) {
+          token = TokenType.Punctuation
+          state = stack.pop() || State.TopLevelContent
+        } else if (
+          (next = part.match(RE_TRIPLE_QUOTED_STRING_CONTENT_DOUBLE_QUOTES))
+        ) {
+          token = TokenType.String
+          state = State.InsideTripleDoubleQuoteString
+        } else if (
+          (next = part.match(RE_TRIPLE_QUOTED_STRING_CONTENT_COMMON))
+        ) {
+          token = TokenType.String
+          state = State.InsideTripleDoubleQuoteString
         } else {
           throw new Error('no')
         }
