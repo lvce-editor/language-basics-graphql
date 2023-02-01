@@ -37,7 +37,7 @@ NewLine
 NewLine
 Keyword
 Whitespace
-Text
+Type
 NewLine
 NewLine
 Keyword
