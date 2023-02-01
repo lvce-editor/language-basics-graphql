@@ -5,6 +5,7 @@ const State = {
   InsideTypeObject: 4,
   InsideFunctionParameters: 6,
   BeforeType: 7,
+  InsideDoubleQuoteString: 8,
 }
 
 /**
@@ -20,6 +21,8 @@ export const TokenType = {
   Punctuation: 6,
   VariableName: 7,
   Function: 8,
+  Numeric: 9,
+  String: 10,
 }
 
 export const TokenMap = {
@@ -31,6 +34,8 @@ export const TokenMap = {
   [TokenType.Punctuation]: 'Punctuation',
   [TokenType.VariableName]: 'VariableName',
   [TokenType.Function]: 'Function',
+  [TokenType.Numeric]: 'Numeric',
+  [TokenType.String]: 'String',
 }
 
 export const initialLineState = {
@@ -53,6 +58,13 @@ const RE_FUNCTION_CALL_NAME = /^[\w]+(?=\s*\()/
 const RE_EXCLAMATION_MARK = /^\!/
 const RE_SQUARE_OPEN = /^\[/
 const RE_SQUARE_CLOSE = /^\]/
+const RE_EQUAL_SIGN = /^=/
+const RE_COMMA = /^,/
+const RE_NUMERIC = /^\d+/
+const RE_QUOTE_DOUBLE = /^"/
+const RE_STRING_DOUBLE_QUOTE_CONTENT = /^[^"\\]+/
+const RE_STRING_ESCAPE = /^\\./
+const RE_BACKSLASH = /^\\/
 
 export const hasArrayReturn = true
 
@@ -116,6 +128,9 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_CURLY_OPEN))) {
           token = TokenType.Punctuation
           state = State.InsideTypeObject
+        } else if ((next = part.match(RE_VARIABLE_NAME))) {
+          token = TokenType.VariableName
+          state = State.AfterTypeName
         } else {
           throw new Error('no')
         }
@@ -146,6 +161,13 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_ROUND_CLOSE))) {
           token = TokenType.Punctuation
           state = State.InsideTypeObject
+        } else if ((next = part.match(RE_CURLY_OPEN))) {
+          token = TokenType.Punctuation
+          state = State.InsideTypeObject
+          stack.push(State.InsideTypeObject)
+        } else if ((next = part.match(RE_COMMA))) {
+          token = TokenType.Punctuation
+          state = State.BeforeType
         } else {
           part
           throw new Error('no')
@@ -197,8 +219,40 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_SQUARE_CLOSE))) {
           token = TokenType.Punctuation
           state = State.BeforeType
+        } else if ((next = part.match(RE_EQUAL_SIGN))) {
+          token = TokenType.Punctuation
+          state = State.BeforeType
+        } else if ((next = part.match(RE_COMMA))) {
+          token = TokenType.Punctuation
+          state = State.BeforeType
+        } else if ((next = part.match(RE_COLON))) {
+          token = TokenType.Punctuation
+          state = State.BeforeType
+        } else if ((next = part.match(RE_NUMERIC))) {
+          token = TokenType.Numeric
+          state = State.BeforeType
+        } else if ((next = part.match(RE_QUOTE_DOUBLE))) {
+          token = TokenType.Punctuation
+          state = State.InsideDoubleQuoteString
         } else {
           part
+          throw new Error('no')
+        }
+        break
+      case State.InsideDoubleQuoteString:
+        if ((next = part.match(RE_QUOTE_DOUBLE))) {
+          token = TokenType.Punctuation
+          state = State.TopLevelContent
+        } else if ((next = part.match(RE_STRING_DOUBLE_QUOTE_CONTENT))) {
+          token = TokenType.String
+          state = State.InsideDoubleQuoteString
+        } else if ((next = part.match(RE_STRING_ESCAPE))) {
+          token = TokenType.String
+          state = State.InsideDoubleQuoteString
+        } else if ((next = part.match(RE_BACKSLASH))) {
+          token = TokenType.String
+          state = State.InsideDoubleQuoteString
+        } else {
           throw new Error('no')
         }
         break
