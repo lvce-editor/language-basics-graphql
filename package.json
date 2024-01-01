@@ -24,7 +24,6 @@
   },
   "test-tokenize": {
     "skip": [
-      "graphql-playground--react-public-blogging",
       "graphql-playground--react-tests-schema.faker"
     ]
   }
