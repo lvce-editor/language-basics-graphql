@@ -147,6 +147,10 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_CURLY_OPEN))) {
           token = TokenType.Punctuation
           state = State.InsideTypeObject
+        } else if ((next = part.match(RE_ROUND_OPEN))) {
+          token = TokenType.Punctuation
+          state = State.InsideFunctionParameters
+          stack.push(State.AfterKeywordTypeOrInputOrInterface)
         } else {
           part
           throw new Error('no')
@@ -173,6 +177,9 @@ export const tokenizeLine = (line, lineState) => {
           state = State.InsideFunctionParameters
           stack.push(State.AfterTypeName)
         } else if ((next = part.match(RE_EQUAL_SIGN))) {
+          token = TokenType.Punctuation
+          state = State.AfterTypeName
+        } else if ((next = part.match(RE_COMMA))) {
           token = TokenType.Punctuation
           state = State.AfterTypeName
         } else {
@@ -306,6 +313,13 @@ export const tokenizeLine = (line, lineState) => {
           token = TokenType.Punctuation
           state = State.InsideFunctionParameters
           stack.push(State.BeforeType)
+        } else if ((next = part.match(RE_CURLY_OPEN))) {
+          token = TokenType.Punctuation
+          state = State.InsideTypeObject
+          stack.push(State.InsideTypeObject)
+        } else if ((next = part.match(RE_CURLY_CLOSE))) {
+          token = TokenType.Punctuation
+          state = stack.pop() || State.TopLevelContent
         } else {
           part
           throw new Error('no')
@@ -392,6 +406,9 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_COMMA))) {
           token = TokenType.Punctuation
           state = State.InsideEnum
+        } else if ((next = part.match(RE_DECORATOR))) {
+          token = TokenType.VariableName
+          state = State.AfterKeywordTypeOrInputOrInterface
         } else {
           throw new Error('no')
         }
