@@ -22,9 +22,5 @@
     "semi": false,
     "singleQuote": true
   },
-  "test-tokenize": {
-    "skip": [
-      "graphql-playground--react-tests-schema.faker"
-    ]
-  }
+  "test-tokenize": {}
 }
