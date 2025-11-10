@@ -2,6 +2,7 @@
   "id": "builtin.language-basics-graphql",
   "name": "Language Basics Graphql",
   "description": "Provides syntax highlighting and bracket matching in Graphql files.",
+  "repository":"https://github.com/lvce-editor/language-basics-graphql",
   "languages": [
     {
       "id": "graphql",
