@@ -1,17 +1,18 @@
 {
   "name": "builtin.language-basics-graphql",
   "version": "0.0.0-dev",
-  "description": "",
-  "main": "index.js",
-  "type": "module",
-  "scripts": {
-    "test": "test-syntax-highlighting",
-    "dev": "node ./node_modules/@lvce-editor/server/bin/server.js ./test/cases --only-extension=.",
-    "lint": "eslint . && prettier --check ."
-  },
-  "keywords": [],
-  "author": "",
   "license": "MIT",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node ./node_modules/@lvce-editor/server/bin/server.js ./test/cases --only-extension=.",
+    "lint": "eslint . && prettier --check .",
+    "test": "test-syntax-highlighting"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  },
   "devDependencies": {
     "@lvce-editor/eslint-config": "^4.0.0",
     "@lvce-editor/package-extension": "^1.6.0",
@@ -20,10 +21,6 @@
     "eslint": "^9.39.2",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3"
-  },
-  "prettier": {
-    "semi": false,
-    "singleQuote": true
   },
   "test-tokenize": {}
 }
