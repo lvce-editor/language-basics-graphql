@@ -30,7 +30,7 @@ const getAllTestsInternal = async (
   allTests,
   seenHashes,
   rootFolder,
-  folder
+  folder,
 ) => {
   const dirents = await readdir(folder, { withFileTypes: true })
   for (const dirent of dirents) {
@@ -75,7 +75,7 @@ const main = async () => {
   await execaCommand(`git checkout ${COMMIT}`)
   process.chdir(root)
   const allTests = await getAllTests(
-    `${root}/.tmp/graphql-compose-examples/examples`
+    `${root}/.tmp/graphql-compose-examples/examples`,
   )
   for (const test of allTests) {
     await copyFile(test.filePath, test.destinationPath)

@@ -32,7 +32,7 @@ const getAllTestsInternal = async (
   allTests,
   seenHashes,
   rootFolder,
-  folder
+  folder,
 ) => {
   const dirents = await readdir(folder, { withFileTypes: true })
   for (const dirent of dirents) {
